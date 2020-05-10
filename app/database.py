@@ -1,9 +1,11 @@
 from google.cloud import bigtable
 from google.cloud.bigtable import column_family
-from google.cloud.bigtable import row_filters
+from google.cloud.bigtable.row_filters import TimestampRange, TimestampRangeFilter, PassAllFilter
 
 from flask import current_app
 from datetime import datetime
+
+import json
 import os
 import logging
 import sys
@@ -25,21 +27,26 @@ def get_conn():
     return instance.table(table)
 
 def add_row(data):
-    conn = current_app.config.db
+    table = current_app.config.db
 
     # format YearMonthDayHourMinuteSecond
-    ts = datetime.now().strftime("%Y%m%d%H%M%S")
+    timestamp = datetime.utcnow()
+    ts = timestamp.isoformat()
 
     # key will be ts and fetched flag
-    key = f'{ts},0'.encode()
+    key = f'{ts}'.encode()
 
     logging.info(f"Adding message {data} with key {key}")
     try:
-        row = conn.direct_row(key)
+        row = table.direct_row(key)
         row.set_cell('message',
                      'c1'.encode(),
                      data,
-                     timestamp=datetime.utcnow())
+                     timestamp=timestamp)
+        row.set_cell("read",
+                     "c2".encode(),
+                     "0",
+                     timestamp=timestamp)
         row.commit()
 
     except Exception as e:
@@ -47,3 +54,51 @@ def add_row(data):
         return False
 
     return True
+
+def get_all_rows(callback):
+    table = current_app.config.db
+    timefilter = PassAllFilter(True)
+    partial_rows = table.read_rows(filter_=timefilter)
+    rows = {}
+    counter = 0
+    for row in partial_rows:
+        key = row.row_key.decode()
+        msg = json.loads(row.cells["message"][b"c1"][0].value.decode())
+        read = bool(int(row.cells["read"][b"c2"][0].value.decode()))
+
+        if callback(key, msg, read, counter) is True:
+            rows[key] = {"message": msg,
+                         "read": read}
+            counter+=1
+    return rows
+
+def get_rows_by_range(start, end):
+    def callback(key, msg, read, counter, start=start, end=end):
+        if counter >= start and counter <= end:
+            return True
+
+    rows = get_all_rows(callback)
+    for row in rows:
+        set_as_fetched(row)
+    return rows
+
+def get_not_fetched_rows():
+    def callback(key, msg, read, counter):
+        if read is True:
+            return False
+        return True
+
+    rows = get_all_rows(callback)
+    for row in rows:
+        set_as_fetched(row)
+    return rows
+
+def set_as_fetched(key):
+    timestamp = datetime.utcnow()
+    table = current_app.config.db
+    row = table.row(key)
+    row.set_cell("read",
+                 "c2".encode(),
+                 "1",
+                 timestamp=timestamp)
+    row.commit()

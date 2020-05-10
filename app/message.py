@@ -1,15 +1,28 @@
-from flask import Flask, request, jsonify, make_response
+from flask import Flask, current_app, request, jsonify, make_response
 from flask_restful import Resource, reqparse
 
+from .database import get_rows_by_range, add_row, get_not_fetched_rows
 
-from .database import add_row
 import json
 
 class Message(Resource):
 
     def get(self):
-        # retrieve message
-        return {'hello': 'world'}
+        parser = reqparse.RequestParser()
+        parser.add_argument('start',
+                            type=int,
+                            help='Start index',
+                            required=False)
+        parser.add_argument('end',
+                            type=int,
+                            help='End index',
+                            required=False)
+        args = parser.parse_args()
+
+        if args.start is None or args.end is None:
+            return get_not_fetched_rows()
+
+        return get_rows_by_range(args.start, args.end)
 
     def post(self):
         parser = reqparse.RequestParser()
