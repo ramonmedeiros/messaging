@@ -1,5 +1,6 @@
 from flask import Flask, current_app, request, jsonify, make_response
 from flask_restful import Resource, reqparse
+from email.utils import parseaddr
 
 from .database import get_rows_by_range, add_row, get_not_fetched_rows
 
@@ -37,6 +38,10 @@ class Message(Resource):
                             help='Message content',
                             required=True)
         args = parser.parse_args()
+
+        # validate email
+        if '@' not in parseaddr(args.recipient)[1]:
+            return make_response(jsonify(message="Incorrect email"), 400)
 
         # save message
         data = json.dumps({"recipient": args.recipient,
