@@ -1,5 +1,4 @@
-from google.cloud import bigtable
-from google.cloud.bigtable import column_family
+from google.cloud.bigtable import column_family, Client
 from google.cloud.bigtable.row_filters import TimestampRange, TimestampRangeFilter, PassAllFilter
 
 from flask import current_app
@@ -22,7 +21,7 @@ def get_conn():
         logging.error("Cannot found table for DB")
         sys.exit(1)
 
-    client = bigtable.Client()
+    client = Client()
     instance = client.instance(dbId)
     return instance.table(table)
 

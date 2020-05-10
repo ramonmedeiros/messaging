@@ -14,3 +14,6 @@ build-image:
 push-image: build-image
 	docker tag $(CONTAINER):$(HASH) $(CONTAINER):latest
 	docker push $(CONTAINER):latest
+
+test:
+	python -m pytest -s
