@@ -5,7 +5,7 @@ TEST_CONTAINER := messaging
 default: run
 
 run:
-	gunicorn 'app:get_app()' -b 0.0.0.0:8080 --access-logfile '-' --worker-class gevent
+	gunicorn 'app:get_app()' -b 0.0.0.0:8080 --access-logfile '-' 
 
 build-image:
 	docker build . -t $(CONTAINER):$(HASH)

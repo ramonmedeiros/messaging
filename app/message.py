@@ -2,8 +2,11 @@ from flask import Flask, request, jsonify, make_response
 from flask_restful import Resource, reqparse
 
 
+from .database import add_row
+import json
 
 class Message(Resource):
+
     def get(self):
         # retrieve message
         return {'hello': 'world'}
@@ -23,5 +26,12 @@ class Message(Resource):
         args = parser.parse_args()
 
         # save message
-        return {'hello': 'world'}
+        data = json.dumps({"recipient": args.recipient,
+                           "message": args.message}).encode()
+
+        # save: if error, return
+        if add_row(data) is False:
+            return make_response(jsonify(message="Cannot save messaage"), 500)
+
+        return make_response(jsonify(message="Added"), 201)
 
