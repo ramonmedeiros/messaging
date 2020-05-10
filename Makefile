@@ -11,6 +11,6 @@ build-image:
 	docker build . -t $(CONTAINER):$(HASH)
 	docker push $(CONTAINER):$(HASH)
 
-push-image:
+push-image: build-image
 	docker tag $(CONTAINER):$(HASH) $(CONTAINER):latest
 	docker push $(CONTAINER):latest
