@@ -1,6 +1,6 @@
 ![CI](https://github.com/ramonmedeiros/messaging/workflows/CI/badge.svg)
 [![codecov](https://codecov.io/gh/ramonmedeiros/messaging/branch/master/graph/badge.svg)](https://codecov.io/gh/ramonmedeiros/messaging)
-
+[![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=ramonmedeiros/messaging&identifier=262852245)](https://dependabot.com)
 # Messaging - playing with Cloud Run and Bigtable
 
 Made with Python, Flask, BigTable and CloudRun, the service is running on Google Cloud by this address https://messaging-viz3uyzyva-lz.a.run.app.
