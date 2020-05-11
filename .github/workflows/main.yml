@@ -44,6 +44,6 @@ jobs:
       run: make push-image
 
     - name: Deploy to cloud run
-    - run: gcloud run deploy messaging --image=gcr.io/messaging-trioptima/messaging --platform=managed --region=europe-north1 --concurrency=1 --port=8080 --timeout=4 --set-env-vars DB_ID=messaging,DB_TABLE=messages,GOOGLE_CLOUD_PROJECT=messaging-trioptima
+      run: gcloud run deploy messaging --image=gcr.io/messaging-trioptima/messaging --platform=managed --region=europe-north1 --concurrency=1 --port=8080 --timeout=4 --set-env-vars DB_ID=messaging,DB_TABLE=messages,GOOGLE_CLOUD_PROJECT=messaging-trioptima
 
 
