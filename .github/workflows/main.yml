@@ -33,7 +33,7 @@ jobs:
 
     - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
       with:
-          version: '270.0.0'
+          version: '290.0.1'
           service_account_email: ${{ secrets.GCP_SA_EMAIL }}
           service_account_key: ${{ secrets.GCP_SA_KEY }}
     - run: |
@@ -43,11 +43,7 @@ jobs:
     - name: Push Image
       run: make push-image
 
-    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
-      with:
-          version: '270.0.0'
-          service_account_email: ${{ secrets.GCP_SA_EMAIL }}
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
+    - name: Deploy to cloud run
     - run: gcloud run deploy messaging --image=gcr.io/messaging-trioptima/messaging --platform=managed --region=europe-north1 --concurrency=1 --port=8080 --timeout=4 --set-env-vars DB_ID=messaging,DB_TABLE=messages,GOOGLE_CLOUD_PROJECT=messaging-trioptima
 
 
