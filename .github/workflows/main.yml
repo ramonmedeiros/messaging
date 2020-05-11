@@ -30,3 +30,24 @@ jobs:
 
     - name: Run coverage
       uses: codecov/codecov-action@v1
+
+    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      with:
+          version: '270.0.0'
+          service_account_email: ${{ secrets.GCP_SA_EMAIL }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+    - run: |
+        gcloud config set project ${{ secrets.GCP_PROJECT }}
+        gcloud auth configure-docker
+
+    - name: Push Image
+      run: make push-image
+
+    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      with:
+          version: '270.0.0'
+          service_account_email: ${{ secrets.GCP_SA_EMAIL }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+    - run: gcloud run deploy messaging --image=gcr.io/messaging-trioptima/messaging --platform=managed --region=europe-north1
+
+
