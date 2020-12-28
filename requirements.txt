@@ -9,7 +9,7 @@ dnspython==1.16.0
 eventlet==0.25.2
 Flask==1.1.2
 Flask-RESTful==0.3.8
-gevent==20.5.0
+gevent==20.12.1
 google-api-core==1.17.0
 google-auth==1.14.2
 google-cloud-bigtable==1.2.1
